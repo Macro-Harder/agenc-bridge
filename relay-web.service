@@ -1,0 +1,22 @@
+[Unit]
+Description=AgenC Bridge web relay (authenticated link over the web)
+After=network.target
+
+[Service]
+# %h is your home directory; the bridge lives at ~/workspace/agenc-bridge.
+# Adjust the paths if you installed it elsewhere.
+# The web relay needs the venv python (websockets lives there).
+# --host 0.0.0.0 exposes it; keep 127.0.0.1 for a local-only relay.
+# --cert/--key serve wss:// directly; or put a reverse proxy
+# (Caddy/nginx) in front terminating TLS. Never expose plain ws://
+# to the internet.
+Type=simple
+ExecStart=%h/workspace/agenc-bridge/.venv/bin/python %h/workspace/agenc-bridge/relay-web.py --host 127.0.0.1
+WorkingDirectory=%h/workspace/agenc-bridge
+Restart=on-failure
+RestartSec=5
+StandardOutput=append:%h/workspace/agenc-bridge/relay-web.log
+StandardError=append:%h/workspace/agenc-bridge/relay-web.log
+
+[Install]
+WantedBy=default.target

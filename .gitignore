@@ -1,0 +1,20 @@
+# Secrets and live state — never commit these.
+BRIDGE-PASSPHRASE.txt
+passphrases/
+bus/
+bus-archive-*/
+relay.log
+relay-web.log
+__pycache__/
+*.pyc
+.env
+*.enc
+*.pem
+*.key
+trusted-keys.json
+trusted-keys.bak
+mcp-tokens.json
+
+.venv/
+DESIGN-BRIEF.md
+DESIGN-PLAN.md

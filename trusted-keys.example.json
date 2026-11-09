@@ -1,0 +1,10 @@
+{
+  "nodes": {
+    "agenc-cloud": {
+      "public_key": "-----BEGIN PUBLIC KEY-----\n...\n-----END PUBLIC KEY-----\n",
+      "fingerprint": "00000 00000 00000 00000 00000 00000 00000 00000 00000 00000 00000 00000",
+      "permissions": ["task", "result", "ask", "message"],
+      "role": "owner"
+    }
+  }
+}

@@ -1,0 +1,17 @@
+[Unit]
+Description=AgenC Bridge relay (persistent authenticated link)
+After=network.target
+
+[Service]
+# %h is your home directory; the bridge lives at ~/workspace/agenc-bridge.
+# Adjust the paths if you installed it elsewhere.
+Type=simple
+ExecStart=/usr/bin/python3 %h/workspace/agenc-bridge/relay.py
+WorkingDirectory=%h/workspace/agenc-bridge
+Restart=on-failure
+RestartSec=5
+StandardOutput=append:%h/workspace/agenc-bridge/relay.log
+StandardError=append:%h/workspace/agenc-bridge/relay.log
+
+[Install]
+WantedBy=default.target
