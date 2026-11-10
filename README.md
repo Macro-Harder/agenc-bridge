@@ -208,7 +208,7 @@ connecting agents
 | `relay-web.service` | systemd unit for the web relay on a real host |
 | `link.py` | Relay client: connect once, receive pushes (`Link` for TCP, `WebLink` for the web relay) |
 | `requirements.txt` | `websockets` — only needed for the web relay |
-| `tests/test_relay_web.py` | Tests for the web relay (run: `.venv/bin/python -m unittest tests.test_relay_web -v`) |
+| `tests/test_relay_web.py` | Tests for the web relay (run: `.venv/bin/python -m unittest tests.test_relay_web -v` — needs the repo .venv built from requirements.txt; without it these tests skip with that reason instead of erroring) |
 | `tests/test_status.py` | Tests for `status`/`dead` (run: `python3 -m unittest tests.test_status -v`) |
 | `tests/test_read.py` | Tests for read-on-read (run: `python3 -m unittest tests.test_read -v`) |
 | `tests/test_threads.py` | Tests for threads (run: `python3 -m unittest tests.test_threads -v`) |
@@ -220,6 +220,7 @@ connecting agents
 | `tests/test_redteam2.py` | Red-team tests, round 2 — regression tests for the independent review's findings (run: `python3 -m unittest tests.test_redteam2 -v`) |
 | `tests/test_redteam3.py` | Red-team tests, round 3 — regression tests for the insider-access review's findings: pinned root of trust, signed wiki manifests, replay-rejection guard, per-node relay rate limiting + socket cap, atomic rekey, signature-checked relay rejections, shared-passphrase retirement, MCP relay host/port override, dead sweep, certified-only token issuance (run: `python3 -m unittest tests.test_redteam3 -v`) |
 | `tests/test_rejection.py` | Tests for rejection errors on failed checks (run: `python3 -m unittest tests.test_rejection -v`) |
+| `tests/test_replay_claim.py` | Tests for the atomic replay claim in `check_envelope`: concurrent claiming checks pass exactly once (run: `python3 -m unittest tests.test_replay_claim -v`) |
 | `tests/test_per_node_keys.py` | Tests for per-node encryption keys and `rekey` (run: `python3 -m unittest tests.test_per_node_keys -v`) |
 | `tests/test_mcp_routing.py` | Tests for MCP routing tokens: issue/verify, wildcard routing to 3 targets through one connection, expired/tampered/wrong-target/revoked refusals (run: `python3 -m unittest tests.test_mcp_routing -v`) |
 | `tests/test_launcher.py` | Tests for the launcher: token issued + handed over by environment only (never in `ps` args, never printed, never on disk), token revoked when the server stops, uncertified/unknown/no-master-key refusals, token-routed ask through the encrypted path through the launched server (run: `python3 -m unittest tests.test_launcher -v`) |

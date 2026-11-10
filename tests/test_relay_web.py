@@ -4,6 +4,12 @@
 Run with the venv python (needs the `websockets` library):
     .venv/bin/python -m unittest tests.test_relay_web -v
 
+The .venv is a real prerequisite (SETUP.md creates it for the
+web relay from requirements.txt). Without it — or without
+`websockets` in the test python — every test here SKIPS with
+that reason instead of erroring, so a clean-clone suite run
+stays honest: green with explicit skips, never silent errors.
+
 The tests spin up a real relay-web.py on localhost with an isolated
 bus, registry, keys, and passphrase, then drive it with WebSocket
 clients. Nothing here touches the live bus, registry, or keys.
@@ -35,6 +41,7 @@ import bridge
 from link import WebLink, _sign_line, _verify_relay_line, _canonical
 
 ROOT = Path(__file__).parent.parent
+VENV_PY = ROOT / ".venv" / "bin" / "python"
 
 def _decrypted(envelope, node, registry):
     """A pushed envelope is v3 on the wire; decrypt it as the
@@ -167,7 +174,7 @@ class WebRelayTests(unittest.IsolatedAsyncioTestCase):
 
     def _start_relay(self):
         self.proc = subprocess.Popen(
-            [str(ROOT / ".venv" / "bin" / "python"), str(ROOT / "relay-web.py"),
+            [str(VENV_PY), str(ROOT / "relay-web.py"),
              "--host", "127.0.0.1", "--port", str(self.port),
              "--bus", str(self.bus), "--registry", str(self.registry_path)],
             env=self.env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
@@ -199,6 +206,18 @@ class WebRelayTests(unittest.IsolatedAsyncioTestCase):
         self._start_relay()
 
     def setUp(self):
+        if not VENV_PY.exists():
+            self.skipTest(
+                "web relay tests need the repo .venv: "
+                "python3 -m venv .venv && "
+                ".venv/bin/pip install -r requirements.txt")
+        try:
+            import websockets  # noqa: F401
+        except ImportError:
+            self.skipTest(
+                "web relay tests need the websockets library in "
+                "the test python: run with "
+                ".venv/bin/python -m unittest tests.test_relay_web")
         # The test process signs with the test keys.
         os.environ["AGENC_BRIDGE_KEYS_DIR"] = str(self.keys_dir)
         os.environ["AGENC_BRIDGE_REGISTRY"] = str(self.registry_path)
