@@ -34,7 +34,7 @@ and only tasks signed by a node in the trusted-keys registry.
 - Headless: `agenc -p --no-tui "<prompt>"`
 - Auth: provider key in the environment (here: OpenRouter via
   `OPENROUTER_API_KEY`); `agenc config set model_provider
-  openrouter` + `model stealth/crouton-alpha` in this deployment.
+  openrouter` + `model meta/muse-ember` in this deployment.
 - Gotchas, found by testing: headless `-p` refuses shell commands
   ("no approver") — AgenC can only call the bridge CLI from a
   durable run (`agenc run start --permission-mode
@@ -130,7 +130,7 @@ via `npm install -g opencode-ai` (Node 18+ needed).
   node's bridge provider key reaches it automatically (see
   `bridge.py provider-key`). No subscription login needed.
 - Headless (what the bridge runs):
-  `opencode run --auto -m openrouter/stealth/crouton-alpha "<prompt>"`
+  `opencode run --auto -m openrouter/meta/muse-ember "<prompt>"`
   - `run` is the one-shot mode; the prompt is the final argument.
   - `--auto` auto-approves permissions that are not explicitly
     denied. Without it, a run that wants a tool can stall waiting
@@ -140,8 +140,9 @@ via `npm install -g opencode-ai` (Node 18+ needed).
     AgenC uses; override with `--agent-cmd` to change it.
   - No git repo is required in the working directory.
 - Smoke test (needs a provider key):
-  `opencode run -m openrouter/stealth/crouton-alpha "What is 6 times 7? Reply with just the number."`
-  Verified here 2026-11-08: answered `42`, exit 0.
+  `opencode run -m openrouter/meta/muse-ember "What is 6 times 7? Reply with just the number."`
+  (The smoke test was verified with the previous default model
+  on 2026-11-08; re-run it after the model change.)
 - Gotcha, found by bridge testing 2026-11-08: `opencode run`
   reads a non-TTY stdin until EOF before it starts, so a worker
   that inherits an open stdin pipe hangs until the task times

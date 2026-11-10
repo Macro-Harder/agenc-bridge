@@ -120,7 +120,7 @@ VERSION = 3
 # envelope to a node that holds an encryption key is still refused
 # as a downgrade — the window is only for nodes without one).
 ENC_GRACE_HOURS = 48  # retired encryption keys stay usable this long
-DEFAULT_MODEL = "stealth/crouton-alpha"
+DEFAULT_MODEL = "meta/muse-ember"
 
 
 def _require_crypto():
@@ -4999,7 +4999,7 @@ AGENT_PROFILES = {
     # cloud AgenC uses; the node's provider key reaches it as
     # OPENROUTER_API_KEY (see run_agent).
     "opencode": ["opencode", "run", "--auto", "-m",
-                 "openrouter/stealth/crouton-alpha"],
+                 "openrouter/meta/muse-ember"],
 }
 
 

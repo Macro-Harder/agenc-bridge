@@ -113,7 +113,7 @@ The decrypted payload is the v2-shaped envelope body — for a task:
     "kind": "prompt",
     "prompt": "Fix the failing parser test in this repo.",
     "cwd": ".",
-    "model": "stealth/crouton-alpha",
+    "model": "meta/muse-ember",
     "timeout_s": 600,
     "max_cost_usd": 0.0
   }
@@ -721,9 +721,11 @@ needs a public IP or domain and an open port (or a tunnel).
 
 ## Model
 
-Default model for all bridge tasks is `stealth/crouton-alpha` via
-OpenRouter (free during its preview, 1M context, verified working
-with the stored OpenRouter credential on 2026-11-06). A task may
+Default model for all bridge tasks is `meta/muse-ember` via
+OpenRouter — the successor to `stealth/crouton-alpha`, which
+OpenRouter retired; `meta/muse-ember` is the live install's
+configured model (`agenc config get model`, verified 2026-11-10).
+A task may
 override `model`, but the worker's AgenC must be configured for the
 OpenRouter provider for that to work.
 

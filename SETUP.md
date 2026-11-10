@@ -154,15 +154,14 @@ unlocks unmigrated nodes' private keys.
 
 ```sh
 agenc config set model_provider openrouter
-agenc config set model stealth/crouton-alpha
+agenc config set model meta/muse-ember
 agenc config set providers.openrouter.zero_data_retention false
 ```
 
-The last line matters: Crouton Alpha has no zero-data-retention
-endpoint on OpenRouter, so AgenC refuses it until ZDR is turned
-off for the OpenRouter provider. Crouton Alpha is a stealth model;
-its provider may retain prompts. Do not send it private data you
-would not send to an unnamed third party.
+The last line is this deployment's setting: the live install
+runs with zero_data_retention off for the OpenRouter provider,
+which means the provider may retain prompts. Do not send it
+private data you would not send to a third party.
 
 Set the provider key in the environment on each node:
 
@@ -326,13 +325,13 @@ same task.
 
 | Node | Machine | Role | Model |
 |---|---|---|---|
-| `agenc-cloud` | this cloud PC (Linux) | owner | assistant + worker (answers prompts, runs tasks) — stealth/crouton-alpha via OpenRouter |
+| `agenc-cloud` | this cloud PC (Linux) | owner | assistant + worker (answers prompts, runs tasks) — meta/muse-ember via OpenRouter |
 | `grokbuild-cloud` | this cloud PC (Linux) | worker | Grok Build CLI (`grok`) — needs `grok login` |
 | `grokcode-cloud` | this cloud PC (Linux) | worker | grok-code (`grok-code`) — needs `XAI_API_KEY`; interactive only, no poll worker |
 | `grokbot-cloud` | xAI cloud | asker | Grok Bot — via MCP / local execution, not a poll worker |
 | `relay` | this cloud PC (Linux) | relay | — (forwards only) |
-| `agenc-desktop-linux` | Your Linux desktop | worker | stealth/crouton-alpha via OpenRouter |
-| `agenc-desktop-windows` | Your Windows desktop | worker | stealth/crouton-alpha via OpenRouter |
+| `agenc-desktop-linux` | Your Linux desktop | worker | meta/muse-ember via OpenRouter |
+| `agenc-desktop-windows` | Your Windows desktop | worker | meta/muse-ember via OpenRouter |
 
 The cloud PC is a single node, `agenc-cloud`: the assistant and the
 worker on that machine share the node name and key. Tasks and prompts
