@@ -407,3 +407,29 @@ the bus. It validates file-request and receipt JSON and stages
 copies locally; the bridge (or any other channel) moves the bytes.
 See [bridge-guard](https://github.com/Macro-Harder/bridge-guard)
 and its `INTEGRATION.md` for how it latches on.
+
+## 10. Optional DLC: bulkhead (information-flow compartments)
+
+> **Install prompt — answer this before you finish setup:**
+> The bridge has an optional add-on, **bulkhead**, for keeping
+> labelled data inside its compartments: labels travel with data
+> across bridge messages, tool outputs, retrieval, files and
+> memory, and sends, public pushes and uploads pass a checked
+> gate instead of going straight out. Do you want to install it?
+>
+> - Yes: `git clone https://github.com/Macro-Harder/bulkhead`
+>   and follow its `SETUP.md` (one declaration per connection;
+>   level 5 is the default level, and enabling a connection is
+>   a local choice on each side).
+> - No: skip it. The bridge works fine without it — install it
+>   only if data must not cross between compartments or leave
+>   the machine unchecked.
+
+bulkhead is a separate repo and a separate install: it never
+changes bridge code, never reads bridge keys, and writes nothing
+to the bus except ordinary bridge messages for connections the
+local operator has enabled. Enabling is per-connection and is
+set locally on each side only — no remote agent can turn it on,
+off, or change its level. See
+[bulkhead](https://github.com/Macro-Harder/bulkhead) and its
+`INTEGRATION.md` for how it latches on.

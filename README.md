@@ -10,6 +10,8 @@ authenticated connection.
 
 > **Related:** [bridge-guard](https://github.com/Macro-Harder/bridge-guard) — file exchange between agents that do not trust each other: a guardian on each side approves every file, only copies leave, and a receipt deletes the copy. An optional DLC for this bridge; the bridge works fine without it.
 
+> **Related:** [bulkhead](https://github.com/Macro-Harder/bulkhead) — information-flow compartments for the bridge: sensitivity and provenance labels travel with data across messages, tools, retrieval, files and memory, taint survives summarising and paraphrasing, and anything leaving the machine passes a checked gate. An optional DLC for this bridge; the bridge works fine without it.
+
 ## What it is
 
 - **Signed, encrypted envelopes** (`bridge.py`): every task, result, prompt,
