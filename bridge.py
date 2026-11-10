@@ -3438,12 +3438,51 @@ def _check_envelope_version(envelope, registry):
     return False, f"unsupported envelope version: {v}"
 
 
-def check_envelope(envelope, registry, me, bus):
+def _envelope_seen(bus, envelope_id):
+    """True when the id is in seen.txt or carries a claim file —
+    a claimed id is seen from the moment the claim lands, before
+    the seen.txt append is visible to other readers."""
+    seen, _ = seen_ids(bus)
+    if envelope_id in seen:
+        return True
+    return (Path(bus) / "seen" / f"claim-{envelope_id}").exists()
+
+
+def _claim_seen(bus, envelope_id):
+    """Atomically claim an envelope id. Returns True when this
+    caller is the first to claim it, False when it was already
+    seen or claimed. The gate is an O_EXCL claim file in seen/ —
+    the same idiom cmd_reply uses for its reply claim — so two
+    concurrent claimers cannot both win; the winner records the
+    id in seen.txt before returning."""
+    if _envelope_seen(bus, envelope_id):
+        return False
+    claim = Path(bus) / "seen" / f"claim-{envelope_id}"
+    try:
+        fd = os.open(claim, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+        os.close(fd)
+    except FileExistsError:
+        return False
+    mark_seen(bus, envelope_id)
+    return True
+
+
+def check_envelope(envelope, registry, me, bus, claim=False):
     """Verify one envelope. Returns (ok, reason).
 
     Checks, in order: version, known sender, signature, recipient,
     the sender's role allows this kind of message, and the id was
-    never seen before (replay guard)."""
+    never seen before (replay guard).
+
+    With claim=True the replay guard stops being check-then-mark:
+    passing the check claims the id atomically (see _claim_seen),
+    so exactly one of two concurrent consumers passes and the
+    other is refused as a replay. Callers that consume the
+    envelope (worker poll, reply, inbox) pass claim=True. The
+    default stays a pure check for callers that only list
+    (prompts) or must retry the same id later (registry updates
+    left pending by a decryption failure) — claiming there would
+    burn an id nothing consumed."""
     ok, reason = _check_envelope_version(envelope, registry)
     if not ok:
         return False, reason
@@ -3456,8 +3495,10 @@ def check_envelope(envelope, registry, me, bus):
     need = KIND_PERMISSION.get(envelope.get("kind", ""))
     if need and need not in registry["nodes"][sender].get("permissions", []):
         return False, f"sender {sender} may not send {envelope.get('kind')} messages"
-    seen, _ = seen_ids(bus)
-    if envelope.get("id") in seen:
+    if claim:
+        if not _claim_seen(bus, envelope.get("id")):
+            return False, "replayed envelope id"
+    elif _envelope_seen(bus, envelope.get("id")):
         return False, "replayed envelope id"
     return True, ""
 
@@ -4329,7 +4370,8 @@ def cmd_inbox(args):
         except Exception as e:
             print(f"unreadable {path.name}: {e}", file=sys.stderr)
             continue
-        ok, reason = check_envelope(envelope, registry, args.node, args.bus)
+        ok, reason = check_envelope(envelope, registry, args.node, args.bus,
+                                    claim=True)
         if not ok:
             print(f"WARNING: message {path.name} failed verification ({reason}), ignored", file=sys.stderr)
             continue
@@ -4764,15 +4806,16 @@ def cmd_reply(args):
     except Exception as e:
         print(f"prompt {args.id} unreadable ({e}), refusing to answer", file=sys.stderr)
         return 1
-    ok, reason = check_envelope(envelope, registry, args.from_node, args.bus)
+    ok, reason = check_envelope(envelope, registry, args.from_node, args.bus,
+                                claim=True)
     if ok:
         # Signature, role, and replay all passed — now decrypt.
         # A decryption failure is NOT silent: the sender is
         # authenticated, so it gets the mismatch report back as a
         # rejected answer — message id, timestamp, both key ids —
-        # instead of a timeout. The id is deliberately NOT marked
-        # seen: the message was never read, and a re-sent copy
-        # must be accepted.
+        # instead of a timeout. The check above claimed the id:
+        # this reply path is the consumer, and a re-sent copy
+        # carries a new id, so claiming here does not block it.
         try:
             envelope = decrypt_envelope(envelope, args.from_node, registry)
         except DecryptError as e:
@@ -5132,16 +5175,18 @@ def poll_once(bus, node, project_root, registry, agent_cmd=None,
             os.replace(path, claimed)
         except FileNotFoundError:
             continue  # another worker claimed it first
-        ok, reason = check_envelope(envelope, registry, node, bus)
+        ok, reason = check_envelope(envelope, registry, node, bus,
+                                    claim=True)
         if ok:
             # Signature, role, and replay all passed — now decrypt.
             # A decryption failure is NOT silent: the sender is
             # authenticated (the signature passed), so it gets the
             # mismatch report back as a rejected result — message
             # id, timestamp, both key ids — instead of a timeout.
-            # The id is deliberately NOT marked seen here: the
-            # message was never read, and a re-sent copy (new id,
-            # re-encrypted under the current key) must be accepted.
+            # The check claimed the id atomically, so no second
+            # consumer can take this envelope; a re-sent copy
+            # carries a new id (re-encrypted under the current
+            # key), so claiming here does not block it.
             try:
                 envelope = decrypt_envelope(envelope, node, registry)
             except DecryptError as e:
