@@ -24,7 +24,9 @@ the relay never decrypts, and a message sent to the wrong pipe fails
 closed — nothing comes out, not garbled text. v2 envelopes are
 rejected by default; the migration window is re-opened only with
 `AGENC_BRIDGE_ALLOW_V2=1`, and then only where v3 was impossible
-(see "Envelope" below). The full design is in `ENCRYPTION-DESIGN.md`.
+(see "Envelope" below). The full design is in `ENCRYPTION-DESIGN.md`,
+kept with the project's design records — it is not part of the
+install tree.
 
 ## Roles
 

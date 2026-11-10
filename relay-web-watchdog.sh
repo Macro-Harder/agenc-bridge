@@ -12,5 +12,9 @@ if (exec 3<>"/dev/tcp/127.0.0.1/$PORT") 2>/dev/null; then
   exit 0
 fi
 cd "$DIR"
+if [ ! -x .venv/bin/python ]; then
+  echo "web relay is down on port $PORT but .venv/bin/python is missing — cannot restart it (create it: python3 -m venv .venv && .venv/bin/pip install -r requirements.txt)"
+  exit 1
+fi
 nohup .venv/bin/python relay-web.py >> relay-web.log 2>&1 &
 echo "web relay was down on port $PORT, restarted it"
